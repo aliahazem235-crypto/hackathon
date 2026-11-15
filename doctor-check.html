@@ -61,7 +61,6 @@ footer a{color:#64748b;text-decoration:none;margin-left:16px}
   </div>
   <div class="badges">
     <span class="pill">Orbit Day 14</span>
-    <!-- <button class="btn-ic" onclick="togV()" id="vic">🔊</button> -->
     <!-- <span style="color:#22d3ee">● CONNECTED</span> -->
   </div>
 </header>
@@ -80,9 +79,15 @@ footer a{color:#64748b;text-decoration:none;margin-left:16px}
           <rect x="46" y="92" width="28" height="12" rx="3" fill="#040816" stroke="#818cf8" stroke-width="1.5"/>
           <circle cx="53" cy="98" r="2" fill="#38bdf8"/><circle cx="60" cy="98" r="2" fill="#a855f7"/><circle cx="67" cy="98" r="2" fill="#22c55e"/>
         </svg>
+       
       </div>
       <div class="wave" id="wv"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
       <div class="doc-t">DR. SANS • FLIGHT SURGEON</div>
+      <!-- AI-Generated Visual Asset -->
+<div style="font-size:7px;color:#64748b;letter-spacing:0.12em;margin-top:6px;font-family:monospace;">
+  ✦ AI-GENERATED VISUAL
+</div>
+
     </div>
 
     <div>
@@ -121,3 +126,33 @@ function go(){idx=0;sc=0;showQ()}
 function showQ(){
   const q=qs[idx],p=((idx+2)/4)*100;
   document.getElementById('bar').style.width=p+'%';document.getElementById('pct').textContent=p+'%';
+  document.getElementById('qBadge').textContent = q.b;
+  document.getElementById('qTitle').textContent = q.t;
+  document.getElementById('qDesc').textContent = q.d;
+  spk(q.t);
+
+  const optsEl = document.getElementById('qOpts');
+  optsEl.innerHTML = q.o.map(opt => `
+    <button class="opt-btn" onclick="nextStep(${opt[2]})">
+      <strong>${opt[0]}</strong>
+      <span>${opt[1]}</span>
+    </button>
+  `).join('');
+}
+
+function nextStep(pts) {
+  sc += pts;
+  idx++;
+  if (idx < qs.length) {
+    showQ();
+  } else {
+    localStorage.setItem('sans_nova_screening', sc);
+    window.location.href = 'vision-test.html';
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => spk(curTxt));
+</script>
+</body>
+</html>
+<!-- AI Assistance Disclosure: Portions of this HTML/CSS/JavaScript code were developed and refined with AI assistance. -->
