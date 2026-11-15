@@ -11,62 +11,242 @@
   <div class="nav-wrap">
     <a href="index.html" class="logo">SANS-GUARD</a>
     <nav class="nav-links mono"><a href="index.html">Home</a><a href="doctor-check.html">Dr. Nova</a><a href="dashboard.html" class="active">Dashboard</a></nav>
-    <span class="pill mono">● CDR MARCUS VANCE • SOL 42</span>
+    
   </div>
 </header>
 <main>
   <div class="top-bar">
     <div><span class="pill mono" style="margin-bottom:8px;">● FLIGHT MEDICAL TELEMETRY</span><h1>SANS NEURO-OCULAR <span>DASHBOARD</span></h1></div>
-    <a href="doctor-check.html" class="btn-nova mono">🎙️ New Dr. Nova Check</a>
+    <a href="doctor-check.html" class="btn-nova mono"> New Dr.SANS Check</a>
   </div>
+
+  <!-- Total Risk Score Banner -->
+  <section class="card" style="border-color:#22d3ee;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;">
+    <div>
+      <div class="card-head mono" style="margin-bottom:4px;"><span>COMPOSITE SANS RISK INDEX • AI TELEMETRY SYNC</span></div>
+      <div class="card-val" id="k-sc" style="font-size:38px;">6 <span>/ 12 Pts</span></div>
+    </div>
+    <div class="mono" style="text-align:right;">
+      <span class="tag" id="riskBadge" style="font-size:12px;padding:6px 14px;color:#fcd34d;border-color:#fbbf24;">MODERATE SANS ALERT</span>
+      <div style="font-size:11px;color:#94a3b8;margin-top:8px;">Weighted Clinical Priority: Ocular (8 Pts) + Systemic (4 Pts)</div>
+    </div>
+  </section>
+
+  <!-- 4 Individual Tests Grid -->
   <section class="grid-4">
-    <div class="card"><div class="card-head mono"><span>SANS RISK SCORE</span><span style="color:#fbbf24;">AI SYNC</span></div><div class="card-val" id="k-sc">3 <span>/ 9 Pts</span></div><div class="card-foot mono"><span style="color:#fcd34d;">▲ +1 pt</span><span class="tag" style="color:#fcd34d;border-color:#fbbf24;">Moderate</span></div></div>
-    <div class="card"><div class="card-head mono"><span>VISUAL ACUITY</span><span>OCULAR</span></div><div class="card-val" id="k-va">2 <span>Pts (+0.75 D)</span></div><div class="card-foot mono"><span style="color:#67e8f9;">Near Vision</span><span class="tag">Hyperopic</span></div></div>
-    <div class="card"><div class="card-head mono"><span>FLUID SHIFT</span><span>CEPHALAD</span></div><div class="card-val" id="k-fs">1 <span>Pt (+18%)</span></div><div class="card-foot mono"><span style="color:#d8b4fe;">Periorbital</span><span class="tag">Mild Shift</span></div></div>
-    <div class="card"><div class="card-head mono"><span>SYMPTOMS &amp; IOP</span><span>NOMINAL</span></div><div class="card-val" id="k-sy">0 <span>Pts (19 mmHg)</span></div><div class="card-foot mono"><span style="color:#6ee7b7;">Limit: 21 mmHg</span><span class="tag">Normal</span></div></div>
+    <div class="card">
+      <div class="card-head mono"><span>01. VISUAL ACUITY</span><span style="color:#22d3ee;">HIGH PRIORITY</span></div>
+      <div class="card-val" id="k-va">2 <span>/ 4 Pts</span></div>
+      <div class="card-foot mono"><span style="color:#67e8f9;">Monocular Shift</span><span class="tag">Ocular</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head mono"><span>02. FLUID SHIFT</span><span style="color:#a855f7;">EARLY MARKER</span></div>
+      <div class="card-val" id="k-fs">1 <span>/ 2 Pts</span></div>
+      <div class="card-foot mono"><span style="color:#d8b4fe;">Periorbital Edema</span><span class="tag">Cephalad</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head mono"><span>03. HEADACHE &amp; PAIN</span><span style="color:#34d399;">DELTA (Δ)</span></div>
+      <div class="card-val" id="k-sy">1 <span>/ 2 Pts</span></div>
+      <div class="card-foot mono"><span id="sy-delta" style="color:#6ee7b7;">Eye Motion Δ</span><span class="tag">Neuro-IOP</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head mono"><span>04. METAMORPHOPSIA</span><span style="color:#fb7185;">HIGH PRIORITY</span></div>
+      <div class="card-val" id="k-mt">2 <span>/ 4 Pts</span></div>
+      <div class="card-foot mono"><span style="color:#fda4af;">Amsler Curvature</span><span class="tag">Macular</span></div>
+    </div>
   </section>
-  <section class="alert-box">
-    <div><strong style="color:#fcd34d;">⚠️ STAGE 2: MODERATE / EARLY WARNING</strong><p style="font-size:13px;margin-top:4px;">Recommended Action: Schedule LBNP 50 mmHg Session &amp; OCT Retinal Scan.</p></div>
-    <span class="pill mono" style="background:#fbbf24;color:#040816;font-weight:700;">STAGE 2 ACTIVE</span>
+
+  <section class="alert-box" id="alertBox">
+    <div><strong id="alertTitle" style="color:#fcd34d;"> STAGE 1: MODERATE SANS EARLY WARNING</strong><p id="alertDesc" style="font-size:13px;margin-top:4px;">Recommended Action: Schedule LBNP 50 mmHg Session &amp; OCT Retinal Scan within 48h.</p></div>
+    <span class="pill mono" id="alertPill" style="background:#fbbf24;color:#040816;font-weight:700;">STAGE 1 ACTIVE</span>
   </section>
+
   <section class="card">
-    <h2 style="font-size:15px;margin-bottom:14px;">7-DAY SANS TELEMETRY TREND (SOL 36 – SOL 42)</h2>
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;">
+      <h2 style="font-size:15px;">7-DAY SANS TELEMETRY TREND (SOL 36 – SOL 42)</h2>
+      <div class="mono" style="display:flex;flex-wrap:wrap;gap:14px;font-size:11px;">
+        <span style="color:#fbbf24;">━ Total Score (/12)</span>
+        <span style="color:#22d3ee;">━ Visual (/4)</span>
+        <span style="color:#fb7185;">━ Metamorphopsia (/4)</span>
+        <span style="color:#a855f7;">━ Fluid (/2)</span>
+        <span style="color:#34d399;">━ Headache (/2)</span>
+      </div>
+    </div>
     <div class="chart-wrap">
-      <svg viewBox="0 0 1000 260" style="width:100%;min-width:650px;height:230px;" fill="none">
-        <line x1="50" y1="30" x2="960" y2="30" stroke="#132d5e" stroke-dasharray="4 4"/><line x1="50" y1="130" x2="960" y2="130" stroke="#132d5e" stroke-dasharray="4 4"/><line x1="50" y1="230" x2="960" y2="230" stroke="#1e3a8a"/>
-        <text x="40" y="35" fill="#64748b" font-size="11" text-anchor="end">8</text><text x="40" y="135" fill="#64748b" font-size="11" text-anchor="end">4</text><text x="40" y="235" fill="#64748b" font-size="11" text-anchor="end">0</text>
-        <text x="100" y="250" fill="#94a3b8" font-size="11">Sol 36</text><text x="245" y="250" fill="#fb7185" font-size="11">Sol 37 [EVA]</text><text x="535" y="250" fill="#94a3b8" font-size="11">Sol 39</text><text x="930" y="250" fill="#22d3ee" font-size="11">Sol 42</text>
-        <path d="M100 230 C160 215,200 55,245 50 C290 45,335 230,390 230 L535 205 L680 180 L825 180 L950 155" stroke="#fbbf24" stroke-width="3.5"/>
-        <path d="M100 230 L245 130 L390 230 L680 205 L950 180" stroke="#22d3ee" stroke-width="2.5"/>
-        <circle cx="245" cy="50" r="6" fill="#fb7185" stroke="#fff"/><circle cx="950" cy="155" r="6" fill="#22d3ee" stroke="#fff"/>
+      <svg viewBox="0 0 1000 280" style="width:100%;min-width:680px;height:250px;" fill="none">
+        <line x1="55" y1="35" x2="965" y2="35" stroke="#132d5e" stroke-dasharray="4 4"/>
+        <line x1="55" y1="103" x2="965" y2="103" stroke="#132d5e" stroke-dasharray="4 4"/>
+        <line x1="55" y1="171" x2="965" y2="171" stroke="#132d5e" stroke-dasharray="4 4"/>
+        <line x1="55" y1="240" x2="965" y2="240" stroke="#1e3a8a"/>
+
+        <text x="45" y="39" fill="#64748b" font-size="11" text-anchor="end">12</text>
+        <text x="45" y="107" fill="#64748b" font-size="11" text-anchor="end">8</text>
+        <text x="45" y="175" fill="#64748b" font-size="11" text-anchor="end">4</text>
+        <text x="45" y="244" fill="#64748b" font-size="11" text-anchor="end">0</text>
+
+        <text x="90" y="264" fill="#94a3b8" font-size="11" text-anchor="middle">Sol 36</text>
+        <text x="230" y="264" fill="#fb7185" font-size="11" text-anchor="middle">Sol 37 [EVA]</text>
+        <text x="370" y="264" fill="#94a3b8" font-size="11" text-anchor="middle">Sol 38</text>
+        <text x="510" y="264" fill="#94a3b8" font-size="11" text-anchor="middle">Sol 39</text>
+        <text x="650" y="264" fill="#94a3b8" font-size="11" text-anchor="middle">Sol 40</text>
+        <text x="790" y="264" fill="#94a3b8" font-size="11" text-anchor="middle">Sol 41</text>
+        <text x="930" y="264" fill="#22d3ee" font-size="11" text-anchor="middle" font-weight="700">Sol 42</text>
+
+        <path id="line-v" d="M90 240 L230 189 L370 206 L510 223 L650 223 L790 206 L930 206" stroke="#22d3ee" stroke-width="2.2" opacity="0.85"/>
+        <path id="line-m" d="M90 240 L230 206 L370 206 L510 223 L650 223 L790 223 L930 206" stroke="#fb7185" stroke-width="2.2" opacity="0.85"/>
+        <path id="line-f" d="M90 240 L230 206 L370 223 L510 223 L650 240 L790 223 L930 223" stroke="#a855f7" stroke-width="2" stroke-dasharray="5 3"/>
+        <path id="line-s" d="M90 240 L230 206 L370 223 L510 240 L650 240 L790 240 L930 223" stroke="#34d399" stroke-width="2" stroke-dasharray="5 3"/>
+        <path id="line-tot" d="M90 240 L230 86 L370 137 L510 189 L650 206 L790 171 L930 137" stroke="#fbbf24" stroke-width="3.8"/>
+
+        <circle cx="90" cy="240" r="4.5" fill="#fbbf24" stroke="#040816" stroke-width="2"/>
+        <circle cx="230" cy="86" r="5" fill="#fb7185" stroke="#040816" stroke-width="2"/>
+        <circle cx="370" cy="137" r="4.5" fill="#fbbf24" stroke="#040816" stroke-width="2"/>
+        <circle cx="510" cy="189" r="4.5" fill="#fbbf24" stroke="#040816" stroke-width="2"/>
+        <circle cx="650" cy="206" r="4.5" fill="#fbbf24" stroke="#040816" stroke-width="2"/>
+        <circle cx="790" cy="171" r="4.5" fill="#fbbf24" stroke="#040816" stroke-width="2"/>
+        <circle id="dot-today" cx="930" cy="137" r="6.5" fill="#22d3ee" stroke="#040816" stroke-width="2"/>
       </svg>
     </div>
   </section>
+
   <section class="card" style="overflow-x:auto;">
-    <h2 style="font-size:15px;margin-bottom:14px;">MISSION ASSESSMENT LOG</h2>
+    <h2 style="font-size:15px;margin-bottom:14px;">7-DAY MISSION ASSESSMENT LOG</h2>
     <table class="mono">
-      <thead><tr><th>Sol</th><th>Visual</th><th>Fluid</th><th>Symptoms</th><th>Total</th><th>Status</th><th>Protocol</th></tr></thead>
+      <thead>
+        <tr>
+          <th>Sol</th>
+          <th>Visual (/4)</th>
+          <th>Fluid (/2)</th>
+          <th>Headache (/2)</th>
+          <th>Metamorphopsia (/4)</th>
+          <th>Total (/12)</th>
+          <th>Status</th>
+          <th>Protocol</th>
+        </tr>
+      </thead>
       <tbody>
-        <tr style="background:rgba(8,51,68,.4)"><td style="color:#22d3ee;font-weight:700;">Sol 42 • TODAY</td><td id="r-nv">2 pts</td><td id="r-fs">1 pt</td><td id="r-sy">0 pts</td><td id="r-tot" style="color:#fcd34d;font-weight:700;">3 Pts</td><td>Early Warning</td><td>LBNP 50 mmHg + OCT Scan</td></tr>
-        <tr><td>Sol 41</td><td>1 pt</td><td>1 pt</td><td>0 pt</td><td>2 Pts</td><td>Low Risk</td><td>Standard exercise &amp; hydration</td></tr>
-        <tr style="background:rgba(136,19,55,.25)"><td style="color:#fda4af;">Sol 37 • EVA</td><td>4 pts</td><td>2 pts</td><td>1 pt</td><td style="color:#fb7185;">7 Pts</td><td>SANS Alert</td><td>Mandatory 60 min LBNP</td></tr>
+        <tr style="background:rgba(8,51,68,0.45);">
+          <td style="font-weight:700;color:#22d3ee;">Sol 42 • TODAY</td>
+          <td id="t-v">2 / 4</td>
+          <td id="t-f">1 / 2</td>
+          <td id="t-s">1 / 2</td>
+          <td id="t-m">2 / 4</td>
+          <td id="t-tot" style="font-weight:800;color:#fcd34d;">6 / 12 Pts</td>
+          <td id="t-st">Moderate Alert</td>
+          <td id="t-pr">LBNP 50 mmHg + OCT Scan</td>
+        </tr>
+        <tr>
+          <td>Sol 41</td><td>2 / 4</td><td>1 / 2</td><td>0 / 2</td><td>1 / 4</td>
+          <td style="font-weight:700;color:#fcd34d;">4 / 12 Pts</td><td>Moderate Alert</td><td>Scheduled Dr. Nova follow-up</td>
+        </tr>
+        <tr>
+          <td>Sol 40</td><td>1 / 4</td><td>0 / 2</td><td>0 / 2</td><td>1 / 4</td>
+          <td style="color:#34d399;">2 / 12 Pts</td><td>Low Risk</td><td>Routine ocular monitoring</td>
+        </tr>
+        <tr>
+          <td>Sol 39</td><td>1 / 4</td><td>1 / 2</td><td>0 / 2</td><td>1 / 4</td>
+          <td style="color:#34d399;">3 / 12 Pts</td><td>Low Risk</td><td>Standard hydration protocol</td>
+        </tr>
+        <tr>
+          <td>Sol 38</td><td>2 / 4</td><td>1 / 2</td><td>1 / 2</td><td>2 / 4</td>
+          <td style="font-weight:700;color:#fcd34d;">6 / 12 Pts</td><td>Moderate Alert</td><td>LBNP 50 mmHg recovery</td>
+        </tr>
+        <tr style="background:rgba(136,19,55,0.22);">
+          <td style="color:#fda4af;font-weight:700;">Sol 37 • EVA</td><td>3 / 4</td><td>2 / 2</td><td>2 / 2</td><td>2 / 4</td>
+          <td style="font-weight:800;color:#fb7185;">9 / 12 Pts</td><td>Critical Alert</td><td>Mandatory 60 min LBNP + OCT</td>
+        </tr>
+        <tr>
+          <td>Sol 36</td><td>0 / 4</td><td>0 / 2</td><td>0 / 2</td><td>0 / 4</td>
+          <td style="color:#34d399;">0 / 12 Pts</td><td>Nominal</td><td>Baseline pre-EVA check</td>
+        </tr>
       </tbody>
     </table>
   </section>
 </main>
-<footer class="mono">© 2026 SANS-GUARD • Flight Medical Telemetry System</footer>
+<!-- <footer class="mono">© 2026 SANS-GUARD • Flight Medical Telemetry System</footer> -->
+
 <script>
-window.addEventListener('DOMContentLoaded',()=>{
-  const s=localStorage.getItem('sans_latest_check'); if(!s)return;
-  const d=JSON.parse(s),t=Math.min(9,d.total||0);
-  document.getElementById('k-sc').innerHTML=`${t} <span>/ 9 Pts</span>`;
-  document.getElementById('k-va').innerHTML=`${d.vision} <span>Pts</span>`;
-  document.getElementById('k-fs').innerHTML=`${d.fluid} <span>Pts</span>`;
-  document.getElementById('k-sy').innerHTML=`${d.symptoms} <span>Pts</span>`;
-  document.getElementById('r-nv').textContent=d.vision+' pts';
-  document.getElementById('r-fs').textContent=d.fluid+' pts';
-  document.getElementById('r-sy').textContent=d.symptoms+' pts';
-  document.getElementById('r-tot').textContent=t+' Pts';
+window.addEventListener('DOMContentLoaded', () => {
+  const raw = localStorage.getItem('sans_latest_check');
+  if (!raw) return;
+  const saved = JSON.parse(raw);
+
+  const v = Math.min(4, Math.max(0, Number(saved.vision || 0)));
+  const f = Math.min(2, Math.max(0, Number(saved.fluid || 0)));
+  const s = Math.min(2, Math.max(0, Number(saved.symptoms || 0)));
+  const m = Math.min(4, Math.max(0, Number(saved.metamorphopsia || 0)));
+  const tot = v + f + s + m;
+
+  document.getElementById('k-sc').innerHTML = `${tot} <span>/ 12 Pts</span>`;
+  document.getElementById('k-va').innerHTML = `${v} <span>/ 4 Pts</span>`;
+  document.getElementById('k-fs').innerHTML = `${f} <span>/ 2 Pts</span>`;
+  document.getElementById('k-sy').innerHTML = `${s} <span>/ 2 Pts</span>`;
+  document.getElementById('k-mt').innerHTML = `${m} <span>/ 4 Pts</span>`;
+
+  if (saved.headacheBefore !== undefined && saved.headacheAfter !== undefined) {
+    const delta = saved.headacheAfter - saved.headacheBefore;
+    document.getElementById('sy-delta').textContent = `${saved.headacheBefore}→${saved.headacheAfter}/10 (${delta >= 0 ? '+' : ''}${delta}Δ)`;
+  }
+
+  const alertBox = document.getElementById('alertBox');
+  const alertTitle = document.getElementById('alertTitle');
+  const alertDesc = document.getElementById('alertDesc');
+  const alertPill = document.getElementById('alertPill');
+  const riskBadge = document.getElementById('riskBadge');
+
+  let statusText = 'Moderate Alert';
+  let protoText = 'LBNP 50 mmHg + OCT Scan';
+
+  if (tot >= 8) {
+    alertBox.style.background = 'rgba(136, 19, 55, 0.35)';
+    alertBox.style.borderColor = '#fb7185';
+    alertTitle.style.color = '#fda4af';
+    alertTitle.textContent = ' STAGE 2: CRITICAL OCULAR / SANS RISK ALERT';
+    alertDesc.textContent = 'Immediate Action: Notify Flight Surgeon, initiate 60-min LBNP & perform urgent OCT + Fundoscopy.';
+    alertPill.style.background = '#fb7185';
+    alertPill.textContent = 'STAGE 2 CRITICAL';
+    riskBadge.style.color = '#fda4af';
+    riskBadge.style.borderColor = '#fb7185';
+    riskBadge.textContent = 'CRITICAL SANS RISK';
+    statusText = 'Critical Alert';
+    protoText = 'Urgent Flight Surgeon + OCT';
+  } else if (tot >= 4) {
+    alertTitle.textContent = ' STAGE 1: MODERATE SANS EARLY WARNING';
+    alertDesc.textContent = 'Recommended Action: Schedule LBNP 50 mmHg Session & OCT Retinal Scan within 48h.';
+    alertPill.textContent = 'STAGE 1 ACTIVE';
+    riskBadge.textContent = 'MODERATE SANS ALERT';
+    statusText = 'Moderate Alert';
+    protoText = 'LBNP 50 mmHg + OCT Scan';
+  } else {
+    alertBox.style.background = 'rgba(6, 78, 59, 0.35)';
+    alertBox.style.borderColor = '#34d399';
+    alertTitle.style.color = '#6ee7b7';
+    alertTitle.textContent = ' STAGE 0: NOMINAL NEURO-OCULAR STATUS';
+    alertDesc.textContent = 'Recommended Action: Continue routine resistive exercise, hydration & weekly Dr. Nova checks.';
+    alertPill.style.background = '#34d399';
+    alertPill.textContent = 'NOMINAL';
+    riskBadge.style.color = '#6ee7b7';
+    riskBadge.style.borderColor = '#34d399';
+    riskBadge.textContent = 'LOW RISK • NOMINAL';
+    statusText = 'Low Risk';
+    protoText = 'Standard exercise & hydration';
+  }
+
+  document.getElementById('t-v').textContent = `${v} / 4`;
+  document.getElementById('t-f').textContent = `${f} / 2`;
+  document.getElementById('t-s').textContent = `${s} / 2`;
+  document.getElementById('t-m').textContent = `${m} / 4`;
+  document.getElementById('t-tot').textContent = `${tot} / 12 Pts`;
+  document.getElementById('t-st').textContent = statusText;
+  document.getElementById('t-pr').textContent = protoText;
+
+  const yPos = val => (240 - (val / 12) * 205).toFixed(0);
+  document.getElementById('line-v').setAttribute('d', `M90 240 L230 189 L370 206 L510 223 L650 223 L790 206 L930 ${yPos(v)}`);
+  document.getElementById('line-m').setAttribute('d', `M90 240 L230 206 L370 206 L510 223 L650 223 L790 223 L930 ${yPos(m)}`);
+  document.getElementById('line-f').setAttribute('d', `M90 240 L230 206 L370 223 L510 223 L650 240 L790 223 L930 ${yPos(f)}`);
+  document.getElementById('line-s').setAttribute('d', `M90 240 L230 206 L370 223 L510 240 L650 240 L790 240 L930 ${yPos(s)}`);
+  document.getElementById('line-tot').setAttribute('d', `M90 240 L230 86 L370 137 L510 189 L650 206 L790 171 L930 ${yPos(tot)}`);
+  document.getElementById('dot-today').setAttribute('cy', yPos(tot));
 });
 </script>
 </body>

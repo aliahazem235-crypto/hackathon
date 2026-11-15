@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SANS-GUARD — Cephalad Fluid Shift Matrix</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: #040816; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column;
+    background-image: radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.14), transparent 55%),
+      linear-gradient(to right, rgba(34, 211, 238, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(34, 211, 238, 0.04) 1px, transparent 1px);
+    background-size: 100% 100%, 50px 50px, 50px 50px;
+  }
+  .mono { font-family: monospace; }
+  header { position: sticky; top: 0; z-index: 50; background: rgba(4, 8, 22, 0.92); border-bottom: 1px solid rgba(34, 211, 238, 0.25); }
+  .nav-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-weight: 900; font-size: 20px; letter-spacing: 0.18em; color: #7289da; text-decoration: none; }
+  .nav-links { display: flex; gap: 24px; font-size: 12px; text-transform: uppercase; }
+  .nav-links a { color: #cbd5e1; text-decoration: none; }
+  .nav-links a.active { color: #22d3ee; font-weight: 700; border-bottom: 2px solid #22d3ee; padding-bottom: 4px; }
+
+  main { max-width: 960px; width: 100%; margin: 0 auto; padding: 28px 20px; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+  .panel {
+    background: rgba(7, 19, 42, 0.78); border: 1.5px solid #22d3ee; border-radius: 18px;
+    padding: 24px; box-shadow: 0 0 30px rgba(0, 229, 255, 0.12);
+  }
+  .top-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .title-grp h1 { font-size: 18px; font-weight: 800; letter-spacing: 0.06em; color: #fff; }
+  .sub-txt { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+  .badges { display: flex; gap: 8px; align-items: center; }
+  .badge-dark { padding: 5px 10px; border-radius: 7px; background: #040816; border: 1px solid #164e63; font-size: 11px; color: #cbd5e1; }
+  .badge-grn { padding: 5px 10px; border-radius: 7px; background: rgba(16, 185, 129, 0.18); border: 1px solid #34d399; font-size: 11px; color: #6ee7b7; font-weight: 700; }
+
+  .cam-alert {
+    background: rgba(8, 51, 68, 0.65); border: 1px solid #22d3ee; border-radius: 12px;
+    padding: 12px 16px; margin-bottom: 18px; display: flex; align-items: center; gap: 12px; font-size: 13px; color: #ecfeff;
+  }
+
+  .face-stage {
+    position: relative; background: #030712; border: 1px solid #164e63; border-radius: 14px;
+    padding: 18px; display: flex; flex-direction: column; align-items: center; overflow: hidden;
+  }
+  .depth-readout { position: absolute; top: 16px; right: 20px; text-align: right; }
+  .depth-readout .lbl { font-size: 10px; color: #94a3b8; }
+  .depth-readout .val { font-size: 20px; font-weight: 800; color: #22d3ee; }
+  .oct-tag {
+    align-self: flex-start; margin-top: 8px; padding: 5px 10px; border-radius: 6px;
+    background: rgba(15, 23, 42, 0.9); border: 1px solid #1e293b; font-size: 10px; color: #94a3b8;
+  }
+
+  .slider-box { margin-top: 18px; background: #040816; border: 1px solid #164e63; border-radius: 14px; padding: 18px 20px; }
+  .sl-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; font-size: 13px; font-weight: 700; }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 99px; cursor: pointer;
+    background: linear-gradient(to right, #10b981 0%, #34d399 25%, #fbbf24 55%, #f97316 80%, #ef4444 100%);
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+    background: #ffffff; border: 3px solid #040816; box-shadow: 0 0 10px #fff; cursor: pointer;
+  }
+  .ticks { display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8; margin-top: 10px; }
+
+  .pulse-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+  .btn-pulse {
+    padding: 11px 18px; border-radius: 9px; border: none; background: #00e5ff; color: #040816;
+    font-size: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 0 18px rgba(0, 229, 255, 0.45);
+  }
+  .btn-reset {
+    padding: 11px 18px; border-radius: 9px; border: 1px solid #334155; background: #0f172a;
+    color: #cbd5e1; font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+  .edema-stat { margin-top: 12px; font-size: 11px; color: #94a3b8; }
+
+  .action-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #164e63; }
+  .btn-save {
+    padding: 12px 22px; border-radius: 11px; border: 2px solid #22d3ee; background: #083344;
+    color: #ecfeff; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 0 20px rgba(0, 229, 255, 0.35);
+  }
+  .btn-save:hover { background: #22d3ee; color: #040816; }
+</style>
+</head>
+<body>
+<header>
+  <div class="nav-wrap">
+    <a href="index.html" class="logo">SANS-GUARD</a>
+    <nav class="nav-links mono">
+      <a href="index.html">Home</a>
+      <a href="doctor-check.html" class="active">Dr. Nova Check</a>
+      <a href="dashboard.html">Dashboard</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="panel">
+    <div class="top-row">
+      <div class="title-grp">
+        <div style="display:flex;align-items:center;gap:10px;">
+          
+          <h1 class="mono">ANATOMICAL LANDMARK MATRIX</h1>
+        </div>
+        <!-- <div class="sub-txt mono">SELECT CEPHALAD REGION TO DEPLOY DYNAMIC PIEZO INDENTER</div> -->
+      </div>
+      <div class="badges mono">
+        <!-- <span class="badge-dark">TARGET: <strong style="color:#fff;">OD-T1</strong></span> -->
+        <span class="badge-grn">LASER ALIGNED</span>
+      </div>
+    </div>
+
+    <div class="cam-alert">
+     
+      <div>
+        <strong style="color:#22d3ee;">OPTICAL ALIGNMENT STEP:</strong> Please turn on your camera, align your face inside the holographic frame, and adjust the slider below to match your observed facial puffiness / periorbital swelling.
+      </div>
+    </div>
+
+    <div class="face-stage">
+      <div class="depth-readout mono">
+        <div class="lbl">OPTICAL DEPTH</div>
+        <div class="val" id="depthVal">1.84 mm</div>
+      </div>
+
+              <!-- Realistic Anatomical 3D Wireframe Face SVG -->
+      <svg viewBox="0 0 380 285" style="width:100%;max-width:390px;height:265px;" fill="none">
+        <defs>
+          <radialGradient id="faceGlow" cx="50%" cy="48%" r="50%">
+            <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.14"/>
+            <stop offset="100%" stop-color="#030712" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="190" cy="140" rx="115" ry="125" fill="url(#faceGlow)"/>
+
+        <!-- Neck & Shoulders -->
+        <path d="M158 212 L154 244 Q125 254 92 274 M222 212 L226 244 Q255 254 288 274" stroke="#155e75" stroke-width="1.5"/>
+        <path d="M154 244 Q190 262 226 244" stroke="#0e7490" stroke-width="1.2" stroke-dasharray="3 3"/>
+
+        <!-- Dynamic Puffiness Layer (Rounded Natural Cranium + Jawline) -->
+        <g id="faceContour" style="transform-origin:190px 140px;transition:0.2s;">
+          <!-- Natural Dome Top & Jawline -->
+          <path d="M124 106 C122 24, 258 24, 256 106 C257 138, 252 168, 241 190 C229 212, 210 226, 190 227 C170 226, 151 212, 139 190 C128 168, 123 138, 124 106 Z" stroke="#22d3ee" stroke-width="1.6"/>
+          <!-- Natural Rounded Hairline -->
+          <path d="M130 88 C144 48, 236 48, 250 88" stroke="#155e75" stroke-width="1.1" stroke-dasharray="4 3"/>
+          <!-- Ears -->
+          <path d="M123 114 C114 114, 113 144, 125 150" stroke="#0e7490" stroke-width="1.4"/>
+          <path d="M257 114 C266 114, 267 144, 255 150" stroke="#0e7490" stroke-width="1.4"/>
+          <!-- Cheekbone & Masseter Topology -->
+          <path d="M130 138 Q148 158 156 192 M250 138 Q232 158 224 192" stroke="#0e7490" stroke-width="1.1"/>
+          <path d="M142 134 Q162 146 174 172 M238 134 Q218 146 206 172" stroke="#155e75" stroke-width="0.9" stroke-dasharray="2 2"/>
+        </g>
+
+        <!-- Realistic Brows & Eyes -->
+        <path d="M136 104 Q154 99 176 105 L174 109 Q154 104 136 107 Z" fill="rgba(34,211,238,0.22)" stroke="#22d3ee" stroke-width="1.2"/>
+        <path d="M244 104 Q226 99 204 105 L206 109 Q226 104 244 107 Z" fill="rgba(34,211,238,0.22)" stroke="#22d3ee" stroke-width="1.2"/>
+        <path d="M141 116 Q157 108 173 116 Q157 123 141 116 Z" stroke="#22d3ee" stroke-width="1.5"/>
+        <circle cx="157" cy="116" r="4.2" stroke="#22d3ee" stroke-width="1.3"/><circle cx="157" cy="116" r="1.6" fill="#00e5ff"/>
+        <path d="M207 116 Q223 108 239 116 Q223 123 207 116 Z" stroke="#22d3ee" stroke-width="1.5"/>
+        <circle cx="223" cy="116" r="4.2" stroke="#22d3ee" stroke-width="1.3"/><circle cx="223" cy="116" r="1.6" fill="#00e5ff"/>
+
+        <!-- Periorbital Edema Bags -->
+        <path d="M142 124 Q157 132 172 124" stroke="#38bdf8" stroke-width="1.3" stroke-dasharray="2 2"/>
+        <path d="M208 124 Q223 132 238 124" stroke="#38bdf8" stroke-width="1.3" stroke-dasharray="2 2"/>
+
+        <!-- Nose & Lips -->
+        <path d="M184 108 L181 142 Q175 148 179 152 Q190 156 201 152 Q205 148 199 142 L196 108" stroke="#22d3ee" stroke-width="1.3"/>
+        <path d="M182 150 Q185 148 188 151 M192 151 Q195 148 198 150" stroke="#00e5ff" stroke-width="1.3"/>
+        <path d="M187 156 L186 167 M193 156 L194 167" stroke="#155e75" stroke-width="1"/>
+        <path d="M169 173 Q182 167 190 170 Q198 167 211 173 Q190 176 169 173 Z" fill="rgba(34,211,238,0.12)" stroke="#22d3ee" stroke-width="1.3"/>
+        <path d="M169 173 Q190 186 211 173" stroke="#22d3ee" stroke-width="1.5"/>
+        <path d="M178 211 Q190 216 202 211" stroke="#155e75" stroke-width="1.2"/>
+
+        <!-- Anatomical Sensor Nodes (Fully Visible Inside Frame) -->
+        <circle cx="190" cy="72" r="4" fill="#22d3ee"/><text x="200" y="75" fill="#94a3b8" font-family="monospace" font-size="9">FZ-01</text>
+        <circle id="critGlow" cx="157" cy="129" r="11" fill="rgba(0,229,255,0.25)"/>
+        <circle cx="157" cy="129" r="4.5" fill="#00e5ff" stroke="#fff"/>
+        <rect x="48" y="120" width="92" height="17" rx="4" fill="#00e5ff"/>
+        <text x="94" y="131" fill="#040816" font-family="monospace" font-size="8" font-weight="bold" text-anchor="middle">OD-T1 [CRITICAL]</text>
+
+        <circle cx="223" cy="129" r="4" fill="#22d3ee"/><text x="233" y="132" fill="#94a3b8" font-family="monospace" font-size="9">OS-T1</text>
+        <circle cx="145" cy="156" r="4" fill="#22d3ee"/><text x="104" y="159" fill="#94a3b8" font-family="monospace" font-size="9">OD-M2</text>
+        <circle cx="235" cy="156" r="4" fill="#22d3ee"/><text x="245" y="159" fill="#94a3b8" font-family="monospace" font-size="9">OS-M2</text>
+        <circle cx="190" cy="204" r="4" fill="#22d3ee"/><text x="200" y="207" fill="#94a3b8" font-family="monospace" font-size="9">SM-03</text>
+      </svg>
+
+
+      <div class="oct-tag mono">回 OPTICAL COHERENCE TURGOR TRACKING</div>
+    </div>
+
+    <div class="slider-box mono">
+      <div class="sl-head">
+        <span style="color:#94a3b8;font-weight:400;">(Observed Facial Swelling)</span>
+        <span style="color:#22d3ee;font-size:20px;" id="kpaVal">15.0 <small style="font-size:12px;">kPa</small></span>
+      </div>
+      <input type="range" id="fluidSlider" min="0" max="50" step="1" value="15" oninput="updateFluid(this.value)"/>
+      <div class="ticks">
+        <span>0 kPa (Surface<br>Resting / Normal)</span>
+        <span style="color:#22d3ee;font-weight:700;">15 kPa (Standardized<br>SANS Pulse)</span>
+        <span>50 kPa (Max Deep<br>Edema / Elasticity)</span>
+      </div>
+
+      <div class="pulse-row">
+        <button class="btn-pulse mono" id="pulseBtn" onclick="triggerPulse()">◎ TRIGGER 15 KPA PULSE</button>
+        <button class="btn-reset mono" onclick="resetIndenter()">↺ RESET INDENTER</button>
+      </div>
+
+      <!-- <div class="edema-stat mono" id="edemaLabel">EDEMA GRADE: 1+ (MODERATE PIT • +18% FLUID SHIFT)</div> -->
+    </div>
+
+    <div class="action-bar mono">
+      <div style="font-size:12px;color:#94a3b8;">
+        Calculated Fluid Shift Score: <strong id="calcFluidPts" style="color:#c084fc;font-size:15px;">1 Pt</strong>
+      </div>
+      <button class="btn-save mono" onclick="saveAndNext()">Save &amp; Next Test (Headache &amp; IOP) →</button>
+    </div>
+  </section>
+</main>
+
+<script>
+  let fluidPts = 1;
+
+  function updateFluid(val) {
+    const kpa = parseFloat(val);
+    const kpaEl = document.getElementById('kpaVal');
+    if (kpaEl) kpaEl.innerHTML = `${kpa.toFixed(1)} <small style="font-size:12px;">kPa</small>`;
+
+    const pulseBtn = document.getElementById('pulseBtn');
+    if (pulseBtn) pulseBtn.textContent = `◎ TRIGGER ${Math.round(kpa)} KPA PULSE`;
+
+    const depthEl = document.getElementById('depthVal');
+    if (depthEl) {
+      const depth = (0.85 + (kpa / 50) * 2.65).toFixed(2);
+      depthEl.textContent = `${depth} mm`;
+    }
+
+    const faceEl = document.getElementById('faceContour');
+    if (faceEl) {
+      const scaleX = 1 + (kpa / 50) * 0.14;
+      faceEl.style.transform = `scaleX(${scaleX.toFixed(3)})`;
+    }
+
+    const glowEl = document.getElementById('critGlow');
+    if (glowEl) {
+      glowEl.setAttribute('r', 8 + (kpa / 50) * 14);
+    }
+
+    let gradeText = 'EDEMA GRADE: 0 (NOMINAL • NO CEPHALAD SHIFT)';
+    if (kpa >= 30) {
+      fluidPts = 2;
+      gradeText = 'EDEMA GRADE: 2+ (SEVERE PERIORBITAL EDEMA • +42% SHIFT)';
+    } else if (kpa >= 15) {
+      fluidPts = 1;
+      gradeText = 'EDEMA GRADE: 1+ (MODERATE PIT • +18% FLUID SHIFT)';
+    } else {
+      fluidPts = 0;
+    }
+
+    const edemaEl = document.getElementById('edemaLabel');
+    if (edemaEl) edemaEl.textContent = gradeText;
+
+    const ptsEl = document.getElementById('calcFluidPts');
+    if (ptsEl) ptsEl.textContent = `${fluidPts} ${fluidPts === 1 ? 'Pt' : 'Pts'}`;
+  }
+
+  function triggerPulse() {
+    const glow = document.getElementById('critGlow');
+    if (glow) {
+      glow.setAttribute('fill', 'rgba(251, 191, 36, 0.55)');
+      setTimeout(() => glow.setAttribute('fill', 'rgba(0, 229, 255, 0.25)'), 400);
+    }
+  }
+
+  function resetIndenter() {
+    const slider = document.getElementById('fluidSlider');
+    if (slider) slider.value = 0;
+    updateFluid(0);
+  }
+
+  function saveAndNext() {
+    const prev = JSON.parse(localStorage.getItem('sans_latest_check') || '{"vision":0,"fluid":0,"symptoms":0,"metamorphopsia":0}');
+    prev.fluid = fluidPts;
+    prev.total = (prev.vision || 0) + prev.fluid + (prev.symptoms || 0) + (prev.metamorphopsia || 0);
+    localStorage.setItem('sans_latest_check', JSON.stringify(prev));
+    window.location.href = 'headache-test.html';
+  }
+</script>
+</body>
+</html>

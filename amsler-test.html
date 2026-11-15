@@ -1,0 +1,335 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SANS-GUARD — Manual Curvature Nullification</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: #040816; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column;
+    background-image: radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.14), transparent 55%),
+      linear-gradient(to right, rgba(34, 211, 238, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(34, 211, 238, 0.04) 1px, transparent 1px);
+    background-size: 100% 100%, 50px 50px, 50px 50px;
+  }
+  .mono { font-family: monospace; }
+  header { position: sticky; top: 0; z-index: 50; background: rgba(4, 8, 22, 0.92); border-bottom: 1px solid rgba(34, 211, 238, 0.25); }
+  .nav-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-weight: 900; font-size: 20px; letter-spacing: 0.18em; color: #7289da; text-decoration: none; }
+  .nav-links { display: flex; gap: 24px; font-size: 12px; text-transform: uppercase; }
+  .nav-links a { color: #cbd5e1; text-decoration: none; }
+  .nav-links a.active { color: #22d3ee; font-weight: 700; border-bottom: 2px solid #22d3ee; padding-bottom: 4px; }
+
+  main { max-width: 960px; width: 100%; margin: 0 auto; padding: 26px 20px; flex: 1; display: flex; flex-direction: column; gap: 18px; }
+  .panel {
+    background: rgba(7, 19, 42, 0.78); border: 1.5px solid #22d3ee; border-radius: 18px;
+    padding: 22px; box-shadow: 0 0 30px rgba(0, 229, 255, 0.12);
+  }
+  .top-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .top-row h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.06em; color: #fff; }
+  .eye-badge { padding: 5px 12px; border-radius: 7px; background: rgba(34, 211, 238, 0.15); border: 1px solid #22d3ee; color: #67e8f9; font-size: 11px; font-weight: 700; }
+
+  .inst-box {
+    background: rgba(8, 51, 68, 0.65); border: 1px solid #22d3ee; border-radius: 12px;
+    padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; font-size: 13px; color: #ecfeff;
+  }
+
+  .radar-box {
+    background: #030712; border: 1px solid #164e63; border-radius: 14px; padding: 14px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .radar-meta { width: 100%; display: flex; justify-content: space-between; font-size: 10px; color: #64748b; }
+  canvas {
+    max-width: 100%; border-radius: 10px; cursor: ns-resize; touch-action: none;
+  }
+
+  .axis-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; padding-top: 14px; border-top: 1px solid #0f2942; font-size: 11px; }
+  .axis-btn { padding: 7px 12px; border-radius: 7px; border: 1px solid #155e75; background: #07132a; color: #94a3b8; font-size: 11px; font-weight: 700; cursor: pointer; }
+  .axis-btn.active { background: #00e5ff; color: #040816; border-color: #00e5ff; }
+  .btn-sm { padding: 7px 12px; border-radius: 7px; border: 1px solid #155e75; background: #07132a; color: #e2e8f0; font-size: 11px; font-weight: 700; cursor: pointer; }
+
+  .action-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-top: 18px; padding-top: 16px; border-top: 1px solid #164e63; }
+  .btn-commit { padding: 12px 20px; border-radius: 10px; border: 1.5px solid #22d3ee; background: #083344; color: #ecfeff; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .btn-record { padding: 12px 22px; border-radius: 10px; border: none; background: #00e5ff; color: #040816; font-size: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 0 20px rgba(0, 229, 255, 0.4); }
+
+  #popupOverlay {
+    display: flex; position: fixed; inset: 0; z-index: 1000; background: rgba(4, 8, 22, 0.9);
+    backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 20px;
+  }
+  .popup-box { max-width: 440px; width: 100%; background: #07132a; border: 2px solid #22d3ee; border-radius: 18px; padding: 28px; text-align: center; box-shadow: 0 0 40px rgba(0, 229, 255, 0.3); }
+  .popup-box h3 { font-size: 18px; color: #fff; margin: 12px 0 8px; }
+  .popup-box p { font-size: 13px; color: #cbd5e1; line-height: 1.6; margin-bottom: 20px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="nav-wrap">
+    <a href="index.html" class="logo">SANS-GUARD</a>
+    <nav class="nav-links mono">
+      <a href="index.html">Home</a>
+      <a href="doctor-check.html" class="active">Dr. Nova Check</a>
+      <a href="dashboard.html">Dashboard</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="panel">
+    <div class="top-row mono">
+      <h1>MANUAL CURVATURE NULLIFICATION ENGINE</h1>
+      <span class="eye-badge" id="eyeBadge">ROUND 1/2 • LEFT EYE ACTIVE</span>
+    </div>
+
+    <div class="inst-box">
+      <div>
+        <strong style="color:#22d3ee;">BLIND MANUAL CALIBRATION:</strong> Fixate on the center dot. <strong>Click and drag the glowing line up or down</strong> with your mouse until it looks <strong>completely straight</strong> to your active eye.
+      </div>
+    </div>
+
+    <div class="radar-box">
+      <div class="radar-meta mono">
+        <span>CAL-GRID FOV: 30° RECTILINEAR</span>
+        <span id="axisMeta" style="color:#22d3ee;">TARGET AXIS: 0° HORIZONTAL</span>
+      </div>
+
+      <canvas id="radarCanvas" width="480" height="270"></canvas>
+
+      <div class="radar-meta mono" style="align-items:center;">
+        <span style="color:#67e8f9;">DRAG WAVE CURVE DIRECTLY ON RADAR</span>
+        <span>● BLIND TELEMETRY MODE</span>
+      </div>
+    </div>
+
+    <div class="axis-row mono">
+      <span style="color:#94a3b8;">AXIS MERIDIAN:</span>
+      <button class="axis-btn active" onclick="setAxis(0, this)">HORIZONTAL 0°</button>
+      <button class="axis-btn" onclick="setAxis(90, this)">VERTICAL 90°</button>
+      <button class="axis-btn" onclick="setAxis(45, this)">OBLIQUE 45°</button>
+      <label style="margin-left:auto;display:flex;align-items:center;gap:6px;color:#cbd5e1;cursor:pointer;">
+        <input type="checkbox" id="gridToggle" checked onchange="drawRadar()" style="accent-color:#00e5ff;"/> Reticle Grid
+      </label>
+      <button class="btn-sm" onclick="resetCurrentEye()">↺ Reset Wave</button>
+    </div>
+
+    <div class="action-bar mono">
+      <div style="font-size:12px;color:#94a3b8;">
+        Telemetry Status: <strong style="color:#34d399;">● Encrypted (Hidden from Subject)</strong>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        <button class="btn-commit" id="eyeActionBtn" onclick="handleEyeStep()">CONFIRM LEFT EYE &amp; SWITCH EYE →</button>
+        <button class="btn-record" style="display:none;" id="finishBtn" onclick="syncDashboard()">📋 COMPLETE CHECK &amp; SYNC DASHBOARD</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Monocular Pop-up Modal -->
+<div id="popupOverlay">
+  <div class="popup-box">
+    <div style="font-size:36px;">👁️</div>
+    <h3 class="mono" id="popTitle">ROUND 1: COVER YOUR RIGHT EYE</h3>
+    <p id="popDesc">Gently cover your <strong>RIGHT EYE</strong> with your hand. Focus on the center dot with your <strong>LEFT EYE</strong> and drag the glowing line up or down until it looks <strong>completely straight</strong>.</p>
+    <button class="btn-record mono" onclick="document.getElementById('popupOverlay').style.display='none'">Start Left Eye Calibration</button>
+  </div>
+</div>
+
+<script>
+  const canvas = document.getElementById('radarCanvas');
+  const ctx = canvas.getContext('2d');
+  let waveAmp = 52;
+  let axis = 0;
+  let round = 1;
+  let leftResidual = 52;
+  let rightResidual = 52;
+  let isDragging = false;
+  let lastY = 0;
+
+  function drawRadar() {
+    const W = canvas.width;
+    const H = canvas.height;
+    const cx = W / 2;
+    const cy = H / 2;
+    ctx.clearRect(0, 0, W, H);
+
+    if (document.getElementById('gridToggle').checked) {
+      ctx.strokeStyle = 'rgba(34, 211, 238, 0.08)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= W; x += 24) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+      }
+      for (let y = 0; y <= H; y += 24) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+      }
+
+      ctx.strokeStyle = 'rgba(34, 211, 238, 0.28)';
+      ctx.beginPath(); ctx.arc(cx, cy, 48, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx, cy, 105, 0, Math.PI * 2); ctx.stroke();
+
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(cx, 10); ctx.lineTo(cx, H - 10); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(20, cy); ctx.lineTo(W - 20, cy); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate((-axis * Math.PI) / 180);
+
+    ctx.strokeStyle = '#00e5ff';
+    ctx.lineWidth = 3.2;
+    ctx.shadowColor = '#00e5ff';
+    ctx.shadowBlur = 15;
+    ctx.beginPath();
+    const span = 195;
+    for (let x = -span; x <= span; x += 3) {
+      const env = Math.cos((x / span) * (Math.PI / 2));
+      const y = Math.sin(x * 0.036) * (waveAmp * 0.32) * env;
+      if (x === -span) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    const handleX = 43;
+    const handleY = Math.sin(handleX * 0.036) * (waveAmp * 0.32) * Math.cos((handleX / span) * (Math.PI / 2));
+    ctx.fillStyle = isDragging ? '#ffffff' : 'rgba(0, 229, 255, 0.35)';
+    ctx.strokeStyle = '#00e5ff';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(handleX, handleY, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function getClientY(e) {
+    return e.touches && e.touches.length ? e.touches[0].clientY : e.clientY;
+  }
+
+  canvas.addEventListener('mousedown', e => { isDragging = true; lastY = getClientY(e); drawRadar(); });
+  canvas.addEventListener('touchstart', e => { isDragging = true; lastY = getClientY(e); drawRadar(); });
+
+  window.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const curY = getClientY(e);
+    waveAmp = Math.max(-100, Math.min(100, waveAmp + (curY - lastY) * 0.85));
+    lastY = curY;
+    if (round === 1) leftResidual = Math.abs(waveAmp);
+    else rightResidual = Math.abs(waveAmp);
+    drawRadar();
+  });
+
+  window.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    const curY = getClientY(e);
+    waveAmp = Math.max(-100, Math.min(100, waveAmp + (curY - lastY) * 0.85));
+    lastY = curY;
+    if (round === 1) leftResidual = Math.abs(waveAmp);
+    else rightResidual = Math.abs(waveAmp);
+    drawRadar();
+  });
+
+  window.addEventListener('mouseup', () => { if (isDragging) { isDragging = false; drawRadar(); } });
+  window.addEventListener('touchend', () => { if (isDragging) { isDragging = false; drawRadar(); } });
+
+  function resetCurrentEye() {
+    waveAmp = round === 1 ? 52 : -48;
+    if (round === 1) leftResidual = Math.abs(waveAmp);
+    else rightResidual = Math.abs(waveAmp);
+    drawRadar();
+  }
+
+  function setAxis(deg, btn) {
+    axis = deg;
+    document.querySelectorAll('.axis-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const names = { 0: '0° HORIZONTAL', 90: '90° VERTICAL', 45: '45° OBLIQUE' };
+    document.getElementById('axisMeta').textContent = `TARGET AXIS: ${names[deg]}`;
+    drawRadar();
+  }
+
+  function calcPts(absVal) {
+    if (absVal >= 60) return 4;
+    if (absVal >= 35) return 3;
+    if (absVal >= 18) return 2;
+    if (absVal >= 7) return 1;
+    return 0;
+  }
+
+  function handleEyeStep() {
+    if (round === 1) {
+      leftResidual = Math.abs(waveAmp);
+      round = 2;
+      waveAmp = -48;
+      rightResidual = 48;
+
+      document.getElementById('eyeBadge').textContent = 'ROUND 2/2 • RIGHT EYE ACTIVE';
+      document.getElementById('eyeActionBtn').style.display = 'none';
+      document.getElementById('finishBtn').style.display = 'inline-block';
+      document.getElementById('finishBtn').textContent = 'COMPLETE TEST & VIEW SCORE →';
+      drawRadar();
+
+      document.getElementById('popTitle').textContent = 'ROUND 2: COVER YOUR LEFT EYE';
+      document.getElementById('popDesc').innerHTML = 'Now cover your <strong>LEFT EYE</strong> with your hand. Focus on the center dot with your <strong>RIGHT EYE</strong> and drag the line up or down until it looks straight.';
+      document.querySelector('#popupOverlay button').textContent = 'Start Right Eye Calibration';
+      document.getElementById('popupOverlay').style.display = 'flex';
+    }
+  }
+
+  function syncDashboard() {
+    rightResidual = Math.abs(waveAmp);
+    const leftPts = calcPts(leftResidual);
+    const rightPts = calcPts(rightResidual);
+    const finalMetaPts = Math.max(leftPts, rightPts);
+
+    const prev = JSON.parse(localStorage.getItem('sans_latest_check') || '{"vision":0,"fluid":0,"symptoms":0}');
+    prev.metamorphopsia = finalMetaPts;
+    prev.total = (prev.vision || 0) + (prev.fluid || 0) + (prev.symptoms || 0) + finalMetaPts;
+    localStorage.setItem('sans_latest_check', JSON.stringify(prev));
+
+    const labels = [
+      'Normal Rectilinear Vision (0 Arcmin)',
+      'Mild Peripheral Curvature',
+      'Moderate Parafoveal Metamorphopsia',
+      'Marked Choroidal Fold Distortion',
+      'Severe Central Metamorphopsia Alert'
+    ];
+
+    document.querySelector('.panel').innerHTML = `
+      <div class="top-row mono">
+        <h1>METAMORPHOPSIA TEST RESULT</h1>
+        <span class="eye-badge" style="border-color:#34d399;color:#6ee7b7;">✓ TEST 04 COMPLETED</span>
+      </div>
+
+      <div style="background:#040816;border:1px solid #164e63;border-radius:14px;padding:24px;text-align:center;margin:16px 0;">
+        <div class="mono" style="font-size:11px;color:#94a3b8;letter-spacing:0.1em;">CALCULATED METAMORPHOPSIA SCORE</div>
+        <div class="mono" style="font-size:48px;font-weight:900;color:#22d3ee;margin:10px 0;">${finalMetaPts} <span style="font-size:20px;color:#64748b;">/ 4 Pts</span></div>
+        <div style="font-size:14px;font-weight:700;color:#fb7185;">${labels[finalMetaPts]}</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:420px;margin:20px auto 0;" class="mono">
+          <div style="background:#07132a;border:1px solid #155e75;border-radius:10px;padding:12px;">
+            <div style="font-size:10px;color:#94a3b8;">LEFT EYE DEVIATION</div>
+            <div style="font-size:16px;font-weight:800;color:#fff;margin-top:4px;">${leftResidual.toFixed(1)} Arcmin (${leftPts} Pts)</div>
+          </div>
+          <div style="background:#07132a;border:1px solid #155e75;border-radius:10px;padding:12px;">
+            <div style="font-size:10px;color:#94a3b8;">RIGHT EYE DEVIATION</div>
+            <div style="font-size:16px;font-weight:800;color:#fff;margin-top:4px;">${rightResidual.toFixed(1)} Arcmin (${rightPts} Pts)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-bar mono" style="justify-content:flex-end;">
+        <button class="btn-record mono" onclick="window.location.href='dashboard.html'">Proceed to Final Dashboard →</button>
+      </div>
+    `;
+  }
+
+  drawRadar();
+</script>
+</body>
+</html>
+
+

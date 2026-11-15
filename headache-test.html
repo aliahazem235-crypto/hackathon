@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SANS-GUARD — Ocular Motility & Headache Stress Test</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: #040816; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column;
+    background-image: radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.14), transparent 55%),
+      linear-gradient(to right, rgba(34, 211, 238, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(34, 211, 238, 0.04) 1px, transparent 1px);
+    background-size: 100% 100%, 50px 50px, 50px 50px;
+  }
+  .mono { font-family: monospace; }
+  header { position: sticky; top: 0; z-index: 50; background: rgba(4, 8, 22, 0.92); border-bottom: 1px solid rgba(34, 211, 238, 0.25); }
+  .nav-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-weight: 900; font-size: 20px; letter-spacing: 0.18em; color: #7289da; text-decoration: none; }
+  .nav-links { display: flex; gap: 24px; font-size: 12px; text-transform: uppercase; }
+  .nav-links a { color: #cbd5e1; text-decoration: none; }
+  .nav-links a.active { color: #22d3ee; font-weight: 700; border-bottom: 2px solid #22d3ee; padding-bottom: 4px; }
+
+  main { max-width: 960px; width: 100%; margin: 0 auto; padding: 28px 20px; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+  .panel {
+    background: rgba(7, 19, 42, 0.78); border: 1.5px solid #22d3ee; border-radius: 18px;
+    padding: 24px; box-shadow: 0 0 30px rgba(0, 229, 255, 0.12);
+  }
+  .top-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .top-row h1 { font-size: 18px; font-weight: 800; letter-spacing: 0.06em; color: #fff; }
+  .std-badge { padding: 4px 10px; border-radius: 6px; background: rgba(251, 191, 36, 0.15); border: 1px solid #f59e0b; color: #fbbf24; font-size: 11px; font-weight: 700; }
+
+  .step-card { background: #040816; border: 1px solid #164e63; border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+  .step-card h2 { font-size: 15px; color: #22d3ee; margin-bottom: 8px; }
+  .step-card p { font-size: 13px; color: #94a3b8; margin-bottom: 16px; }
+
+  .slider-row { display: flex; align-items: center; gap: 16px; margin: 12px 0; }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none; flex: 1; height: 8px; border-radius: 99px; cursor: pointer;
+    background: linear-gradient(to right, #10b981 0%, #fbbf24 50%, #ef4444 100%);
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+    background: #ffffff; border: 3px solid #040816; box-shadow: 0 0 10px #fff; cursor: pointer;
+  }
+  .score-box { min-width: 75px; text-align: center; padding: 6px 10px; border-radius: 8px; background: rgba(34,211,238,0.15); border: 1px solid #22d3ee; color: #22d3ee; font-weight: 800; font-size: 15px; }
+
+  .btn-primary {
+    padding: 12px 22px; border-radius: 11px; border: 2px solid #22d3ee; background: #083344;
+    color: #ecfeff; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 0 20px rgba(0, 229, 255, 0.35); transition: 0.2s;
+  }
+  .btn-primary:hover { background: #22d3ee; color: #040816; }
+
+  /* Fullscreen Black Tracking Arena */
+  #arena {
+    display: none; position: fixed; inset: 0; z-index: 999; background: #000000;
+  }
+  #hudStatus {
+    position: absolute; top: 18px; left: 50%; transform: translateX(-50%);
+    padding: 6px 16px; border-radius: 99px; background: rgba(15, 23, 42, 0.85);
+    border: 1px solid #22d3ee; color: #67e8f9; font-size: 12px; letter-spacing: 0.08em;
+  }
+  #star {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-size: 38px; color: #00e5ff; text-shadow: 0 0 18px #00e5ff, 0 0 35px #fff;
+    transition: top 1.6s ease-in-out, left 1.6s ease-in-out; user-select: none;
+  }
+
+  /* Pop-up Modal Overlay */
+  #popupOverlay {
+    display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(4, 8, 22, 0.88);
+    backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 20px;
+  }
+  .popup-box {
+    max-width: 440px; width: 100%; background: #07132a; border: 2px solid #22d3ee; border-radius: 18px;
+    padding: 28px; text-align: center; box-shadow: 0 0 40px rgba(0, 229, 255, 0.3);
+  }
+  .popup-box h3 { font-size: 19px; color: #fff; margin: 12px 0 8px; }
+  .popup-box p { font-size: 14px; color: #cbd5e1; line-height: 1.6; margin-bottom: 20px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="nav-wrap">
+    <a href="index.html" class="logo">SANS-GUARD</a>
+    <nav class="nav-links mono">
+      <a href="index.html">Home</a>
+      <a href="doctor-check.html" class="active">Dr. Nova Check</a>
+      <a href="dashboard.html">Dashboard</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="panel">
+    <div class="top-row">
+      <h1 class="mono">OCULAR MOTILITY &amp; HEADACHE STRESS TEST</h1>
+      <span class="std-badge mono">TEST 03 / 04 • NEURO-SYMPTOMS</span>
+    </div>
+
+    <!-- Step 1: Baseline Headache Before Test -->
+    <div class="step-card" id="stepBefore">
+      <h2 class="mono">STEP 1: PRE-TEST BASELINE HEADACHE LEVEL</h2>
+      <p>Before starting eye movement tracking, rate your current headache or orbital pressure level (0 = No pain, 10 = Severe pain):</p>
+      <div class="slider-row mono">
+        <span style="font-size:12px;color:#34d399;">0 (None)</span>
+        <input type="range" id="preSlider" min="0" max="10" step="1" value="0" oninput="document.getElementById('preVal').textContent=this.value+' / 10'"/>
+        <span style="font-size:12px;color:#ef4444;">10 (Severe)</span>
+        <div class="score-box" id="preVal">0 / 10</div>
+      </div>
+      <div style="margin-top:16px;text-align:right;">
+        <button class="btn-primary mono" onclick="beginRound(1)">Start Eye Tracking Test →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Post-Test Headache After Tracking -->
+    <div class="step-card" id="stepAfter" style="display:none;">
+      <h2 class="mono">STEP 2: POST-TRACKING HEADACHE LEVEL</h2>
+      <p>Now that you completed tracking the star with both eyes, rate your headache or eye-strain pain level right now:</p>
+      <div class="slider-row mono">
+        <span style="font-size:12px;color:#34d399;">0 (None)</span>
+        <input type="range" id="postSlider" min="0" max="10" step="1" value="0" oninput="updatePost(this.value)"/>
+        <span style="font-size:12px;color:#ef4444;">10 (Severe)</span>
+        <div class="score-box" id="postVal">0 / 10</div>
+      </div>
+
+      <div style="margin-top:18px;padding:14px;border-radius:10px;background:#07132a;border:1px solid #164e63;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;" class="mono">
+        <div style="font-size:12px;color:#94a3b8;">
+          Induced Headache Delta (After − Before): <strong id="deltaTxt" style="color:#fbbf24;font-size:14px;">+0</strong>
+        </div>
+        <div style="font-size:12px;color:#94a3b8;">
+          Calculated Symptom Score: <strong id="symPtsTxt" style="color:#22d3ee;font-size:15px;">0 Pts</strong>
+        </div>
+      </div>
+
+      <div style="margin-top:18px;text-align:right;">
+        <button class="btn-primary mono" onclick="saveAndNext()">Save &amp; Go to Final Test (Amsler test) →</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Pop-up Instruction Modal -->
+<div id="popupOverlay">
+  <div class="popup-box">
+    <div style="font-size:38px;">👁️‍🗨️</div>
+    <h3 class="mono" id="popTitle">COVER YOUR RIGHT EYE</h3>
+    <p id="popDesc">Please gently cover your <strong>RIGHT EYE</strong> with your hand. Keep your head still and follow the glowing star smoothly with your <strong>LEFT EYE</strong> only.</p>
+    <button class="btn-primary mono" onclick="startStarSequence()">I'm Ready. Start Tracking. </button>
+  </div>
+</div>
+
+<!-- Fullscreen Black Star Arena -->
+<div id="arena">
+  <div id="hudStatus" class="mono">ROUND 1/2 • RIGHT EYE COVERED • FOLLOW THE STAR</div>
+  <div id="star">★</div>
+</div>
+
+<script>
+  let currentRound = 1;
+  let symPts = 0;
+
+  function beginRound(roundNum) {
+    currentRound = roundNum;
+    const pop = document.getElementById('popupOverlay');
+    if (roundNum === 1) {
+      document.getElementById('popTitle').textContent = 'ROUND 1: COVER YOUR RIGHT EYE';
+      document.getElementById('popDesc').innerHTML = 'Gently cover your <strong>RIGHT EYE</strong> with your hand. Keep your head still and follow the glowing star to the edges of the screen with your <strong>LEFT EYE</strong>.';
+    } else {
+      document.getElementById('popTitle').textContent = 'ROUND 2: COVER YOUR LEFT EYE';
+      document.getElementById('popDesc').innerHTML = 'Now switch hands and cover your <strong>LEFT EYE</strong>. Keep your head still and track the star with your <strong>RIGHT EYE</strong>.';
+    }
+    pop.style.display = 'flex';
+  }
+
+  function startStarSequence() {
+    document.getElementById('popupOverlay').style.display = 'none';
+    const arena = document.getElementById('arena');
+    const star = document.getElementById('star');
+    const hud = document.getElementById('hudStatus');
+
+    hud.textContent = currentRound === 1
+      ? 'ROUND 1/2 • RIGHT EYE COVERED • TRACK STAR'
+      : 'ROUND 2/2 • LEFT EYE COVERED • TRACK STAR';
+
+    star.style.transition = 'none';
+    star.style.top = '50%';
+    star.style.left = '50%';
+    arena.style.display = 'block';
+
+    // Movement Sequence: Center -> Right -> Left -> Center -> Top -> Bottom -> Center
+    const moves = [
+      { t: 400,  top: '50%', left: '93%' }, // Far Right
+      { t: 2300, top: '50%', left: '7%'  }, // Far Left
+      { t: 4300, top: '50%', left: '50%' }, // Center
+      { t: 5700, top: '8%',  left: '50%' }, // Far Top
+      { t: 7600, top: '92%', left: '50%' }, // Far Bottom
+      { t: 9500, top: '50%', left: '50%' }  // Return Center
+    ];
+
+    moves.forEach(m => {
+      setTimeout(() => {
+        star.style.transition = 'top 1.6s ease-in-out, left 1.6s ease-in-out';
+        star.style.top = m.top;
+        star.style.left = m.left;
+      }, m.t);
+    });
+
+    setTimeout(() => {
+      arena.style.display = 'none';
+      if (currentRound === 1) {
+        beginRound(2); // Pop-up for second eye
+      } else {
+        // Both eyes done -> Show post-test headache rating
+        const pre = parseInt(document.getElementById('preSlider').value);
+        document.getElementById('stepBefore').style.display = 'none';
+        document.getElementById('stepAfter').style.display = 'block';
+        document.getElementById('postSlider').value = pre;
+        updatePost(pre);
+      }
+    }, 11200);
+  }
+
+  function updatePost(val) {
+    const post = parseInt(val);
+    const pre = parseInt(document.getElementById('preSlider').value);
+    document.getElementById('postVal').textContent = `${post} / 10`;
+
+    const delta = Math.max(0, post - pre);
+    document.getElementById('deltaTxt').textContent = `+${delta} (Pre: ${pre} → Post: ${post})`;
+
+    // Calculate SANS Symptom Points based on induced headache delta
+    if (delta >= 4) symPts = 2;
+    else if (delta >= 2) symPts = 1;
+    else symPts = 0;
+
+    document.getElementById('symPtsTxt').textContent = `${symPts} ${symPts === 1 ? 'Pt' : 'Pts'}`;
+  }
+
+  function saveAndNext() {
+    const prev = JSON.parse(localStorage.getItem('sans_latest_check') || '{"vision":2,"fluid":1,"symptoms":0}');
+    prev.symptoms = symPts;
+    prev.total = (prev.vision || 0) + (prev.fluid || 0) + prev.symptoms;
+    localStorage.setItem('sans_latest_check', JSON.stringify(prev));
+    window.location.href = 'amsler-test.html';
+  }
+</script>
+</body>
+</html>

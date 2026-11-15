@@ -1,0 +1,289 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SANS-GUARD — Digital Near Acuity Matrix</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: #040816; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column;
+    background-image: radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.14), transparent 55%),
+      linear-gradient(to right, rgba(34, 211, 238, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(34, 211, 238, 0.04) 1px, transparent 1px);
+    background-size: 100% 100%, 50px 50px, 50px 50px;
+  }
+  .mono { font-family: monospace; }
+  header { position: sticky; top: 0; z-index: 50; background: rgba(4, 8, 22, 0.92); border-bottom: 1px solid rgba(34, 211, 238, 0.25); }
+  .nav-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-weight: 900; font-size: 20px; letter-spacing: 0.18em; color: #7289da; text-decoration: none; }
+  .nav-links { display: flex; gap: 24px; font-size: 12px; text-transform: uppercase; }
+  .nav-links a { color: #cbd5e1; text-decoration: none; }
+  .nav-links a.active { color: #22d3ee; font-weight: 700; border-bottom: 2px solid #22d3ee; padding-bottom: 4px; }
+
+  main { max-width: 960px; width: 100%; margin: 0 auto; padding: 28px 20px; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+  .panel {
+    background: rgba(7, 19, 42, 0.78); border: 1.5px solid #22d3ee; border-radius: 18px;
+    padding: 24px; box-shadow: 0 0 30px rgba(0, 229, 255, 0.12);
+  }
+  .top-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .title-grp { display: flex; align-items: center; gap: 10px; }
+  .title-grp h1 { font-size: 18px; font-weight: 800; letter-spacing: 0.08em; color: #fff; }
+  .std-badge { padding: 3px 8px; border-radius: 6px; background: rgba(34, 211, 238, 0.12); border: 1px solid rgba(34, 211, 238, 0.4); color: #67e8f9; font-size: 11px; font-weight: 700; }
+
+  .ctrl-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+  .btn-tool {
+    padding: 8px 14px; border-radius: 9px; border: 1px solid #155e75; background: #040816;
+    color: #cbd5e1; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: 0.2s;
+  }
+  .btn-tool:hover { border-color: #22d3ee; color: #fff; }
+
+  .matrix-box {
+    position: relative; background: #030712; border: 1px solid #164e63; border-radius: 14px;
+    padding: 18px 22px; transition: 0.25s; overflow: hidden;
+  }
+  .matrix-box.inverted { background: #f8fafc; color: #020617; border-color: #38bdf8; }
+  .matrix-box.inverted .row-lbl { color: #475569; }
+  .matrix-box.inverted .letters { color: #020617; }
+  .matrix-box.inverted .acuity-row.selected { background: rgba(6, 182, 212, 0.22); border-color: #0891b2; }
+
+  .m-meta { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-bottom: 14px; }
+  .fix-ok { color: #34d399; font-weight: 700; }
+
+  .chart-rows { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 0; }
+  .acuity-row {
+    width: 100%; max-width: 440px; display: flex; align-items: center; justify-content: center; gap: 22px;
+    padding: 7px 14px; border-radius: 9px; border: 1px solid transparent; cursor: pointer; transition: 0.15s;
+  }
+  .acuity-row:hover { border-color: rgba(34, 211, 238, 0.4); background: rgba(8, 51, 68, 0.35); }
+  .acuity-row.selected { background: rgba(8, 51, 68, 0.85); border-color: #22d3ee; box-shadow: 0 0 18px rgba(0, 229, 255, 0.2); }
+  .row-lbl { width: 54px; text-align: right; font-size: 10px; line-height: 1.2; color: #94a3b8; }
+  .acuity-row.selected .row-lbl { color: #22d3ee; font-weight: 700; }
+  .letters { font-weight: 800; letter-spacing: 0.32em; color: #f8fafc; text-align: center; flex: 1; }
+
+  .slider-box { margin-top: 18px; background: #040816; border: 1px solid #164e63; border-radius: 14px; padding: 18px 20px; }
+  .sl-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; font-size: 12px; }
+  .val-pill { padding: 4px 10px; border-radius: 6px; background: rgba(34, 211, 238, 0.14); border: 1px solid #22d3ee; color: #22d3ee; font-weight: 700; }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 99px; cursor: pointer;
+    background: linear-gradient(to right, #10b981 0%, #34d399 22%, #fbbf24 50%, #f97316 75%, #ef4444 100%);
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.2);
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+    background: #ffffff; border: 3px solid #040816; box-shadow: 0 0 10px #fff; cursor: pointer;
+  }
+
+  .ticks { display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8; margin-top: 10px; }
+  .ticks .hi { color: #22d3ee; font-weight: 700; }
+
+  .action-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #164e63; }
+  .btn-save {
+    padding: 12px 22px; border-radius: 11px; border: 2px solid #22d3ee; background: #083344;
+    color: #ecfeff; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 0 20px rgba(0, 229, 255, 0.35); transition: 0.2s;
+  }
+  .btn-save:hover { background: #22d3ee; color: #040816; }
+</style>
+</head>
+<body>
+<header>
+  <div class="nav-wrap">
+    <a href="index.html" class="logo">SANS-GUARD</a>
+    <nav class="nav-links mono">
+      <a href="index.html">Home</a>
+      <a href="doctor-check.html" class="active">Dr. Nova Check</a>
+      <a href="dashboard.html">Dashboard</a>
+    </nav>
+  </div>
+</header>
+
+
+<main>
+  <section class="panel">
+    <div class="top-row">
+      <div class="title-grp">
+        <h1 class="mono">DIGITAL NEAR ACUITY MATRIX</h1>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span class="std-badge mono" id="eyeBadge" style="color:#67e8f9;border-color:#22d3ee;">ROUND 1/2 • LEFT EYE</span>
+        <span class="std-badge mono" style="color:#fbbf24;border-color:#f59e0b;">TEST 01 / 04 • OCULAR</span>
+      </div>
+    </div>
+    <div style="background:rgba(8,51,68,0.65);border:1px solid #22d3ee;border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;font-size:13px;color:#ecfeff;">
+      <div>
+        <strong style="color:#22d3ee;">CALIBRATION STEP:</strong> Please hold your screen at <strong>Arm's Length (~35–40 cm / 14 inches)</strong> before adjusting the slider for an accurate reading.
+      </div>
+    </div>
+
+    <div class="ctrl-btns mono">
+      <button class="btn-tool" onclick="toggleInvert()">◐ High Contrast Invert</button>
+      <button class="btn-tool" onclick="randomizeChart()">⇄ Randomize (Optotype Seed)</button>
+    </div>
+
+    <div class="matrix-box" id="matrixBox">
+      <div class="m-meta mono">
+        <span class="fix-ok">● FOVEA CENTRALIS: FIXATED (99.1%)</span>
+      </div>
+
+      <div class="chart-rows mono" id="chartRows">
+        <div class="acuity-row" data-pts="4" onclick="selectRow(this)">
+          <div class="row-lbl">J7 -<br>20/100</div>
+          <div class="letters" style="font-size:26px;" data-len="1">E</div>
+        </div>
+        <div class="acuity-row" data-pts="3" onclick="selectRow(this)">
+          <div class="row-lbl">J6 -<br>20/70</div>
+          <div class="letters" style="font-size:22px;" data-len="2">F P</div>
+        </div>
+        <div class="acuity-row" data-pts="2" onclick="selectRow(this)">
+          <div class="row-lbl">J5 -<br>20/50</div>
+          <div class="letters" style="font-size:19px;" data-len="3">T O Z</div>
+        </div>
+        <div class="acuity-row" data-pts="2" onclick="selectRow(this)">
+          <div class="row-lbl">J4 -<br>20/40</div>
+          <div class="letters" style="font-size:16px;" data-len="4">L P E D</div>
+        </div>
+        <div class="acuity-row selected" data-pts="2" onclick="selectRow(this)">
+          <div class="row-lbl">J3 -<br>20/30</div>
+          <div class="letters" style="font-size:14px;" data-len="5">P E C F D</div>
+        </div>
+        <div class="acuity-row" data-pts="1" onclick="selectRow(this)">
+          <div class="row-lbl">J2 -<br>20/25</div>
+          <div class="letters" style="font-size:12px;" data-len="6">E D F C Z P</div>
+        </div>
+        <div class="acuity-row" data-pts="0" onclick="selectRow(this)">
+          <div class="row-lbl">J1 -<br>20/20</div>
+          <div class="letters" style="font-size:10px;letter-spacing:0.22em;" data-len="11">F E L O P Z D 4 8 2 7 9</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slider-box mono">
+      <div class="sl-head">
+        <span>REFRACTIVE DEFOCUS OFFSET <span style="color:#94a3b8;">(Ciliary Effort Compensator)</span></span>
+        <div>VAL: <span class="val-pill" id="diopterVal">+0.75 D</span> <span style="color:#64748b;font-size:11px;">[CURRENT]</span></div>
+      </div>
+      <input type="range" id="diopterSlider" min="-0.50" max="2.50" step="0.25" value="0.75" oninput="updateDiopter(this.value)"/>
+      <div class="ticks">
+        <span>-0.50 D<br>(Myopic)</span>
+        <span>0.00 D<br>(Emmetropic)</span>
+        <span class="hi">+0.75 D (Observed<br>Shift)</span>
+        <span>+1.50<br>D</span>
+        <span>+2.50 D (Hyperopic<br>Max)</span>
+      </div>
+    </div>
+
+    <div class="action-bar mono">
+      <div style="font-size:12px;color:#94a3b8;">
+        Calculated Visual Score: <strong id="calcPts" style="color:#22d3ee;font-size:15px;">2 Pts</strong> (Hyperopic Shift)
+      </div>
+      <button class="btn-save mono" id="nextBtn" onclick="saveAndNext()">Confirm Left Eye &amp; Switch Eye →</button>
+    </div>
+  </section>
+</main>
+
+<!-- Monocular Eye Pop-up -->
+<div id="eyePopup" style="display:flex;position:fixed;inset:0;z-index:1000;background:rgba(4,8,22,0.9);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;">
+  <div style="max-width:430px;width:100%;background:#07132a;border:2px solid #22d3ee;border-radius:18px;padding:28px;text-align:center;box-shadow:0 0 40px rgba(0,229,255,0.3);">
+    <div style="font-size:38px;">👁️</div>
+    <h3 class="mono" id="popTitle" style="font-size:18px;color:#fff;margin:12px 0 8px;">ROUND 1: COVER YOUR RIGHT EYE</h3>
+    <p id="popText" style="font-size:13px;color:#cbd5e1;line-height:1.6;margin-bottom:20px;">
+      Please gently cover your <strong>RIGHT EYE</strong> with your hand. Adjust the slider until the chart looks sharp for your <strong>LEFT EYE</strong>.
+    </p>
+    <button class="btn-save mono" onclick="document.getElementById('eyePopup').style.display='none'">Start Left Eye Test</button>
+  </div>
+</div>
+
+<script>
+  const levels = [
+    { id: 0, maxD: 2.50, pts: 4, label: 'Severe Hyperopic Blur' },
+    { id: 1, maxD: 1.75, pts: 3, label: 'Marked Hyperopic Shift' },
+    { id: 2, maxD: 1.25, pts: 2, label: 'Moderate Shift' },
+    { id: 3, maxD: 1.00, pts: 2, label: 'Mild-Moderate Shift' },
+    { id: 4, maxD: 0.75, pts: 2, label: 'Observed Hyperopic Shift' },
+    { id: 5, maxD: 0.25, pts: 1, label: 'Minimal Defocus' },
+    { id: 6, maxD: 0.00, pts: 0, label: 'Emmetropic (Sharp 20/20)' }
+  ];
+
+  let currentPts = 2;
+  let eyeRound = 1;
+  let leftEyePts = 0;
+
+  function toggleInvert() {
+    document.getElementById('matrixBox').classList.toggle('inverted');
+  }
+
+  function randomizeChart() {
+    const pool = 'EFPTZOLDCHKNVR';
+    document.querySelectorAll('.letters').forEach(el => {
+      const len = parseInt(el.dataset.len);
+      let arr = [];
+      for (let i = 0; i < len; i++) arr.push(pool[Math.floor(Math.random() * pool.length)]);
+      el.textContent = arr.join(' ');
+    });
+  }
+
+  function selectRow(rowEl) {
+    const rows = [...document.querySelectorAll('.acuity-row')];
+    const idx = rows.indexOf(rowEl);
+    const targetD = levels[idx].maxD;
+    document.getElementById('diopterSlider').value = targetD;
+    updateDiopter(targetD);
+  }
+
+  function updateDiopter(val) {
+    const d = parseFloat(val);
+    const sign = d > 0 ? '+' : '';
+    document.getElementById('diopterVal').textContent = `${sign}${d.toFixed(2)} D`;
+
+    const rows = [...document.querySelectorAll('.acuity-row')];
+    let activeIdx = 6;
+    if (d >= 2.00) activeIdx = 0;
+    else if (d >= 1.50) activeIdx = 1;
+    else if (d >= 1.25) activeIdx = 2;
+    else if (d >= 1.00) activeIdx = 3;
+    else if (d >= 0.50) activeIdx = 4;
+    else if (d > 0.00) activeIdx = 5;
+    else activeIdx = 6;
+
+    rows.forEach((r, idx) => {
+      r.classList.toggle('selected', idx === activeIdx);
+      const blurAmount = idx > activeIdx ? (idx - activeIdx) * 1.4 : 0;
+      r.querySelector('.letters').style.filter = blurAmount ? `blur(${blurAmount}px)` : 'none';
+      r.style.opacity = idx > activeIdx ? '0.45' : '1';
+    });
+
+    currentPts = levels[activeIdx].pts;
+    document.getElementById('calcPts').textContent = `${currentPts} Pts (${levels[activeIdx].label})`;
+  }
+
+  function saveAndNext() {
+    if (eyeRound === 1) {
+      leftEyePts = currentPts;
+      eyeRound = 2;
+
+      document.getElementById('eyeBadge').textContent = 'ROUND 2/2 • RIGHT EYE';
+      document.getElementById('nextBtn').textContent = 'Save & Next Test (Fluid Shift) →';
+      randomizeChart();
+      document.getElementById('diopterSlider').value = 0.75;
+      updateDiopter(0.75);
+
+      document.getElementById('popTitle').textContent = 'ROUND 2: COVER YOUR LEFT EYE';
+      document.getElementById('popText').innerHTML = 'Now switch hands and cover your <strong>LEFT EYE</strong>. Adjust the slider until the new chart looks sharp for your <strong>RIGHT EYE</strong>.';
+      document.querySelector('#eyePopup button').textContent = 'Start Right Eye Test';
+      document.getElementById('eyePopup').style.display = 'flex';
+    } else {
+      const finalVisionPts = Math.max(leftEyePts, currentPts);
+      const prev = JSON.parse(localStorage.getItem('sans_latest_check') || '{"vision":0,"fluid":0,"symptoms":0,"metamorphopsia":0}');
+      prev.vision = finalVisionPts;
+      prev.total = finalVisionPts + (prev.fluid || 0) + (prev.symptoms || 0) + (prev.metamorphopsia || 0);
+      localStorage.setItem('sans_latest_check', JSON.stringify(prev));
+      window.location.href = 'fluid-test.html';
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => updateDiopter(0.75));
+</script>
+</body>
+</html>
